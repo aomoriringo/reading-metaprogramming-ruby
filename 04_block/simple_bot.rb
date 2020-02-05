@@ -18,7 +18,33 @@
 #     4. settingsメソッドは、任意のオブジェクトを返します
 #     5. settingsメソッドは、後述するクラスメソッドsettingによって渡された第一引数と同名のメソッド呼び出しに応答します
 # 3. クラスメソッドrespondは、keywordとブロックを引数に取ります
-#     1. respondメソッドの第1引数keywordと同じ文字列が、インスタンス変数askに渡された時、第2引数に渡したブロックが実行され、その結果が返されます
+#     1. respondメソッドの第1引数keywordと同じ文字列が、インスタンスメソッドaskに渡された時、第2引数に渡したブロックが実行され、その結果が返されます
 # 4. クラスメソッドsettingは、引数を2つ取り、1つ目がキー名、2つ目が設定する値です
 #     1. settingメソッドに渡された値は、インスタンスメソッド `settings` から返されるオブジェクトに、メソッド名としてアクセスすることで取り出すことができます
 #     2. e.g. クラスメソッドで `setting :name, 'bot'` と実行した場合は、インスタンス内で `settings.name` の戻り値は `bot` の文字列になります
+
+class SimpleBot
+  # @settings = {}
+
+  def self.respond(keyword, &sav_method)
+    @keyword = keyword
+    @sav_method = sav_method
+  end
+
+  def self.setting(key, val)
+    @settings = {}
+    @settings[key] = val
+  end
+
+  def ask(ask_keyword)
+    if @keyword == ask_keyword
+      return @sav_method.call
+    else
+      nil
+    end
+  end
+
+  def settings(key)
+    @settings[key]
+  end
+end
