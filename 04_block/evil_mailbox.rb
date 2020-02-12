@@ -21,15 +21,12 @@
 class EvilMailbox
   def initialize(obj, secret=nil)
     @obj = obj
-    if secret
-      @obj.auth(secret)
-    end
+    obj.auth(secret) if secret
 
-    define_singleton_method :send_mail do |to, body|
-      mail_sent = @obj.send_mail(to, body + secret.to_s)
-      if block_given?
-        yield(mail_sent)
-      end
+    define_singleton_method :send_mail do |to, body, &block|
+      body += secret if secret
+      mail_sent = @obj.send_mail(to, body)
+      block.call(mail_sent) if block
       nil
     end
   end
