@@ -24,27 +24,40 @@
 #     2. e.g. クラスメソッドで `setting :name, 'bot'` と実行した場合は、インスタンス内で `settings.name` の戻り値は `bot` の文字列になります
 
 class SimpleBot
-  # @settings = {}
-
-  def self.respond(keyword, &sav_method)
-    @keyword = keyword
-    @sav_method = sav_method
+  def self.respond(key, &sav_method)
+    @responds ||= {}
+    @responds[key] = sav_method
   end
 
   def self.setting(key, val)
-    @settings = {}
+    @settings ||= {}
     @settings[key] = val
   end
 
-  def ask(ask_keyword)
-    if @keyword == ask_keyword
-      return @sav_method.call
+  def initialize
+    obj = self
+    self.class.class_eval do
+      @responds ||= {}
+      @settings ||= {}
+
+      obj.instance_variable_set(:@responds, @responds)
+      @settings.each do |key, val|
+        obj.define_singleton_method key do
+          val
+        end
+      end
+    end
+  end
+
+  def ask(word)
+    if @responds.key? word
+      self.instance_eval &@responds[word]
     else
       nil
     end
   end
 
-  def settings(key)
-    @settings[key]
+  def settings
+    self
   end
 end
