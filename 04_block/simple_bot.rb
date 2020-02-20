@@ -61,4 +61,3 @@ class SimpleBot
     self
   end
 end
-=======
